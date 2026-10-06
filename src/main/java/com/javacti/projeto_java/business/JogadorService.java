@@ -9,7 +9,6 @@ public class JogadorService {
 
     private final JogadorRepository repository;
 
-
     public JogadorService(JogadorRepository repository) {
         this.repository = repository;
     }

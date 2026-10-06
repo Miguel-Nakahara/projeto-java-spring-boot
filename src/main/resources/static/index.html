@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Clube de jogadores</title>
+    <title>FM 27 • Clube de jogadores</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header>
     <div class="shell topbar">
         <div class="brand">
-            FUTMANAGER <span>27</span>
+            FUTMARKET <span>27</span>
             <div class="tag">Player Management</div>
         </div>
         <nav aria-label="Seção atual">
@@ -29,7 +29,7 @@
         <div class="eyebrow">Ultimate club / Temporada 27</div>
         <h1>Monte o seu legado.</h1>
         <p>Gerencie seu elenco, encontre jogadores e coloque as próximas estrelas em campo.</p>
-        <button class="primary" id="add" onclick="">＋ Adicionar jogador</button>
+        <button class="primary" id="add">＋ Adicionar jogador</button>
     </section>
 
     <section class="stats" aria-label="Resumo do elenco">
@@ -63,7 +63,7 @@
                 <h2>Cartas de jogadores</h2>
             </div>
             <form class="toolbar" id="searchForm">
-                <input type="email" id="buscarEmail" aria-label="Buscar jogador por e-mail" placeholder="Buscar por e-mail" required>
+                <input type="text" id="buscarNome" aria-label="Buscar jogador por nome" placeholder="Buscar por nome" required>
                 <button type="submit">Buscar ↗</button>
                 <button type="button" id="clear">Limpar</button>
             </form>
@@ -88,10 +88,6 @@
                 Nome
                 <input id="nome" maxlength="100" required placeholder="Nome do jogador">
             </label>
-            <label class="wide">
-                E-mail
-                <input id="email" type="email" required placeholder="jogador@email.com">
-            </label>
             <label>
                 Idade
                 <input id="idade" type="number" min="1" max="120" placeholder="Ex.: 23">
@@ -113,7 +109,7 @@
                 </select>
             </label>
         </div>
-        <p class="note">A API original salva nome e e-mail. Idade, valor e categoria ficam neste navegador até que o back-end ofereça esses campos. A nota da carta é ilustrativa, baseada na categoria.</p>
+        <p class="note">Todos os campos são salvos na API. A nota da carta é ilustrativa, baseada no desempenho. O elenco exibe os jogadores cadastrados ou buscados nesta sessão.</p>
         <p class="modal-error" id="formError" role="alert" hidden></p>
         <div class="actions">
             <button type="button" data-close>Cancelar</button>
@@ -152,301 +148,6 @@
 </dialog>
 
 <div id="notice" class="notice" role="status" hidden></div>
-
-<script>
-    'use strict';
-
-    const api = '/usuario';
-    const $ = id => document.getElementById(id);
-    const ratings = {
-        horrivel: 45,
-        ruim: 55,
-        mediano: 65,
-        bom: 75,
-        otimo: 83,
-        craque: 90,
-        lenda: 99
-    };
-    const labels = {
-        horrivel: 'Horrível',
-        ruim: 'Ruim',
-        mediano: 'Mediano',
-        bom: 'Bom',
-        otimo: 'Ótimo',
-        craque: 'Craque',
-        lenda: 'Lenda'
-    };
-
-    let players = [];
-    let selected = null;
-    let editing = null;
-    let toastTimer;
-
-    const money = value =>
-        new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(
-            Number(value) || 0
-        );
-
-    const esc = value =>
-        String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-
-    function meta(email) {
-        try {
-            return JSON.parse(localStorage.getItem('fc27:' + email) || '{}');
-        } catch {
-            return {};
-        }
-    }
-
-    function writeMeta(email, data) {
-        try {
-            localStorage.setItem('fc27:' + email, JSON.stringify(data));
-        } catch {
-            notify('Salvo na API, mas os dados extras não puderam ser armazenados neste navegador.', true);
-        }
-    }
-
-    function enrich(p) {
-        return { ...meta(p.email), ...p };
-    }
-
-    function notify(message, error = false) {
-        clearTimeout(toastTimer);
-        $('notice').textContent = message;
-        $('notice').classList.toggle('error', error);$('notice').hidden = false;
-        toastTimer = setTimeout(() => ($('notice').hidden = true), 6000);
-    }
-
-    function card(p) {
-        const cat = p.categoria || 'mediano';
-        const known = Boolean(p.categoria);
-        const age = p.idade ?? '—';
-        const value = p.valor == null ? '—' : money(p.valor);
-
-        return `<div class="card ${cat === 'lenda' || cat === 'craque' ? 'special' : ['horrivel', 'ruim', 'mediano'].includes(cat) ? 'silver' : ''}">
-  <div class="rating">${known ? ratings[cat] || '—' : '—'}<span class="position">${known ? 'GER' : 'S/NOTA'}</span></div>
-  <div class="portrait">
-    <svg viewBox="0 0 120 130" aria-hidden="true">
-      <circle cx="60" cy="35" r="25" fill="currentColor"/>
-      <path d="M8 125V100Q8 70 39 65L60 78L81 65Q112 70 112 100V125Z" fill="currentColor"/>
-      <path d="M48 84H72V120H48Z" fill="white" opacity=".15"/>
-    </svg>
-  </div>
-  <div class="player-name">${esc(p.nome || 'Jogador')}</div>
-  <div class="card-data">
-    <div><strong>${esc(age)}</strong>IDADE</div>
-    <div><strong style="font-size:13px">${esc(value)}</strong>VALOR</div>
-  </div>
-  <div class="card-foot">${known ? esc(labels[cat] || cat) : 'SEM CATEGORIA'}</div>
-</div>`;
-    }
-
-    function render() {
-        const grid = $('grid');
-        grid.replaceChildren();
-
-        $('count').textContent = players.length;
-        $('total').textContent = money(players.reduce((s, p) => s + (Number(p.valor) \vert{}\vert{} 0), 0));$('legends').textContent = players.filter(p => p.categoria === 'lenda').length;
-
-        if (!players.length) {
-            grid.innerHTML = `<div class="empty">
-  <div class="empty-icon">♧</div>
-  <h3>Seu próximo craque começa aqui.</h3>
-  <p>Adicione um jogador ou busque um e-mail cadastrado para exibir sua carta.</p>
-  <button class="primary" id="emptyAdd">＋ Adicionar jogador</button>
-</div>`;
-            $('emptyAdd').onclick = () => openEditor();
-            return;
-        }
-
-        players.forEach(p => {
-            const b = document.createElement('button');
-            b.className = 'player';
-            b.setAttribute('aria-label', 'Ver detalhes de ' + p.nome);
-            b.innerHTML = card(p) + '<span class="player-hint">VER DETALHES ↗</span>';
-            b.onclick = () => openDetail(p);
-            grid.append(b);
-        });
-    }
-
-    function openEditor(p = null) {
-        editing = p;
-        $('playerForm').reset();$('formError').hidden = true;
-        $('editorTitle').textContent = p ? 'Editar jogador' : 'Adicionar jogador';
-
-        for (const key of ['nome', 'email', 'idade', 'valor']) {
-            $(key).value = p?.[key] ?? '';
-        }
-
-        $('categoria').value = p?.categoria \vert{}\vert{} 'mediano';$('editor').showModal();
-    }
-
-    function openDetail(p) {
-        selected = p;
-        $('detailContent').innerHTML = `<div class="detail-card">${card(p)}</div>
-<div class="details">
-  <div><span>E-mail</span><strong>${esc(p.email)}</strong></div>
-  <div><span>ID na API</span><strong>${esc(p.id ?? 'Não informado')}</strong></div>
-</div>`;
-        $('detail').showModal();
-    }
-
-    async function request(url, options = {}) {
-        let resp;
-        try {
-            resp = await fetch(url, options);
-        } catch {
-            throw new Error('Não foi possível conectar à API /usuario. Abra a página no servidor do seu projeto.');
-        }
-
-        if (!resp.ok) {
-            throw new Error(resp.status === 404 ? 'Jogador não encontrado.' : `A API retornou erro ${resp.status}. Nenhuma alteração foi confirmada.`);
-        }
-
-        if (resp.status === 204) return null;
-
-        const text = await resp.text();
-        if (!text) return null;
-
-        try {
-            return JSON.parse(text);
-        } catch {
-            return null;
-        }
-    }
-
-    function unpack(data) {
-        const list = Array.isArray(data)
-            ? data
-            : Array.isArray(data?.data)
-                ? data.data
-                : Array.isArray(data?.usuarios)
-                    ? data.usuarios
-                    : [data?.usuario || data?.data || data];
-
-        return list.filter(p => p && typeof p === 'object' && ('nome' in p || 'email' in p));
-    }
-
-    function upsert(p, oldEmail) {
-        players = players.filter(x => x.email !== p.email && x.email !== oldEmail);
-        players.push(p);
-        render();
-    }
-
-    $('add').onclick = () => openEditor();$('clear').onclick = () => {
-        players = [];
-        $('searchForm').reset();
-        render();
-    };
-
-    $('playerForm').onsubmit = async e => {
-        e.preventDefault();
-        const btn = e.submitter;
-        btn.disabled = true;
-        $('formError').hidden = true;
-
-        const nome = $('nome').value.trim();
-        const email = $('email').value.trim();
-        const extra = {
-            idade: $('idade').value ? Number($('idade').value) : null,
-            valor: $('valor').value ? Number($('valor').value) : null,
-            categoria: $('categoria').value
-        };
-
-        try {
-            if (!nome) throw new Error('Informe um nome válido.');
-            if (editing && editing.id == null) {
-                throw new Error('A API precisa retornar o ID do jogador para permitir a edição. Busque o cadastro novamente.');
-            }
-
-            const data = await request(editing ? `${api}?id=${encodeURIComponent(editing.id)}` : api, {
-                method: editing ? 'PUT' : 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nome, email })
-            });
-
-            writeMeta(email, extra);
-            const result = unpack(data)[0] || {};
-            const p = enrich({ ...editing, ...result, nome, email, ...extra });
-            upsert(p, editing?.email);
-            $('editor').close();
-            notify(editing ? 'Jogador atualizado!' : 'Jogador cadastrado!');
-        } catch (err) {
-            $('formError').textContent = err.message;
-            $('formError').hidden = false;
-        } finally {
-            btn.disabled = false;
-        }
-    };
-
-    $('searchForm').onsubmit = async e => {
-        e.preventDefault();
-        const btn = e.submitter;
-        btn.disabled = true;
-
-        try {
-            const email = $('buscarEmail').value.trim();
-            const data = await request(`${api}?email=${encodeURIComponent(email)}`);
-            const found = unpack(data);
-
-            if (!found.length) throw new Error('A API não retornou dados de um jogador.');
-
-            players = found.map(enrich);
-            render();
-            notify('Busca concluída.');
-        } catch (err) {
-            notify(err.message, true);
-        } finally {
-            btn.disabled = false;
-        }
-    };
-
-    $('edit').onclick = () => {$('detail').close();
-        openEditor(selected);
-    };
-
-    $('remove').onclick = () => {
-        $('detail').close();$('deleteError').hidden = true;
-        $('confirmText').textContent = `Excluir ${selected.nome}? Essa ação remove o cadastro na API e não pode ser desfeita nesta página.`;
-        $('confirm').showModal();
-    };
-
-    $('confirmRemove').onclick = async () => {
-        const btn = $('confirmRemove');
-        btn.disabled = true;
-
-        try {
-            if (!selected.email) throw new Error('O cadastro não possui e-mail para exclusão.');
-
-            await request(`${api}?email=${encodeURIComponent(selected.email)}`, { method: 'DELETE' });
-            players = players.filter(p => p.email !== selected.email);
-
-            try {
-                localStorage.removeItem('fc27:' + selected.email);
-            } catch {}
-
-            render();
-            $('confirm').close();
-            notify('Jogador excluído.');
-        } catch (err) {
-            $('deleteError').textContent = err.message;
-            $('deleteError').hidden = false;
-        } finally {
-            btn.disabled = false;
-        }
-    };
-
-    for (const dialog of document.querySelectorAll('dialog')) {
-        dialog.querySelectorAll('[data-close]').forEach(b => (b.onclick = () => dialog.close()));
-        dialog.addEventListener('click', e => {
-            const r = dialog.getBoundingClientRect();
-            if (e.target === dialog && (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom)) {
-                dialog.close();
-            }
-        });
-    }
-
-    render();
-</script>
+<script src="script.js"></script>
 </body>
 </html>
