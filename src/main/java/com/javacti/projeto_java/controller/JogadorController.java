@@ -34,6 +34,7 @@ public class JogadorController {
 
     @PutMapping
     public ResponseEntity<Void> atualizarJogadorPorId(@RequestParam Integer id, @RequestBody Jogador jogador){
+        jogador.setId(id);
         jogadorService.atualizarJogadorPorId(id, jogador);
 
         return ResponseEntity.ok().build();
