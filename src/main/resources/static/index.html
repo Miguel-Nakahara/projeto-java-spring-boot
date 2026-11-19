@@ -3,102 +3,168 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>FM 27 • Clube de jogadores</title>
+    <meta name="theme-color" content="#0c1421">
+    <title>FC 27 | Lista de transferências</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header>
-    <div class="shell topbar">
-        <div class="brand">
-            FUTMARKET <span>27</span>
-            <div class="tag">Player Management</div>
+<div class="app-frame">
+    <header class="topbar">
+        <a class="brand" href="/" aria-label="FC 27 - Início">
+            <span class="brand-mark">FC</span>
+            <span class="brand-year">27</span>
+        </a>
+        <div class="topbar-title">
+            <span class="back-mark">‹</span>
+            <div>
+                <span class="breadcrumb">CLUBE / MERCADO</span>
+                <strong>Lista de transferências</strong>
+            </div>
         </div>
-        <nav aria-label="Seção atual">
-            <span class="active">Meu clube</span>
-            <span>Jogadores</span>
-        </nav>
-        <div class="club-mark">
-            <span class="badge">FM</span>
-            <span class="tag">Seu clube. Sua história.</span>
+        <div class="topbar-info">
+            <span class="coin-icon">●</span>
+            <strong>GESTÃO DO ELENCO</strong>
+            <span class="club-shield">FC</span>
         </div>
+    </header>
+
+    <div class="app-body">
+        <aside class="sidebar" aria-label="Navegação principal">
+            <a class="side-link" href="#inicio" aria-label="Início">
+                <span class="side-icon">⌂</span>
+                <span>Início</span>
+            </a>
+            <a class="side-link" href="#elenco" aria-label="Meu elenco">
+                <span class="side-icon">♙</span>
+                <span>Elenco</span>
+            </a>
+            <a class="side-link active" href="#transferencias" aria-current="page" aria-label="Transferências">
+                <span class="side-icon">⇄</span>
+                <span>Mercado</span>
+            </a>
+            <a class="side-link" href="#jogadores" aria-label="Jogadores">
+                <span class="side-icon">▤</span>
+                <span>Jogadores</span>
+            </a>
+            <div class="sidebar-bottom">
+                <span class="side-icon">⚙</span>
+                <span>Config.</span>
+            </div>
+        </aside>
+
+        <main class="main-content" id="inicio">
+            <div class="workspace" id="transferencias">
+                <section class="market-column" id="elenco">
+                    <div class="page-heading">
+                        <div>
+                            <span class="eyebrow">CENTRAL DE TRANSFERÊNCIAS</span>
+                            <h1>Mercado de jogadores</h1>
+                            <p>Gerencie os atletas do seu clube e acompanhe o valor do elenco.</p>
+                        </div>
+                        <button class="primary-button" id="add" type="button">
+                            <span>＋</span> Cadastrar jogador
+                        </button>
+                    </div>
+
+                    <section class="summary-strip" aria-label="Resumo do elenco">
+                        <div class="summary-item">
+                            <span class="summary-label">JOGADORES</span>
+                            <strong id="count">0</strong>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-item">
+                            <span class="summary-label">VALOR DO ELENCO</span>
+                            <strong id="total">R$ 0</strong>
+                        </div>
+                        <div class="summary-divider"></div>
+                        <div class="summary-item">
+                            <span class="summary-label">LENDAS</span>
+                            <strong id="legends">0</strong>
+                        </div>
+                    </section>
+
+                    <section class="market-panel" id="jogadores">
+                        <div class="panel-heading">
+                            <div>
+                                <span class="eyebrow">SEU CLUBE</span>
+                                <h2>Jogadores cadastrados <span id="listCount" class="count-pill">0</span></h2>
+                            </div>
+                            <button class="icon-button" id="refresh" type="button" aria-label="Atualizar lista" title="Atualizar lista">↻</button>
+                        </div>
+
+                        <form class="search-toolbar" id="searchForm">
+                            <label class="search-box">
+                                <span>⌕</span>
+                                <input type="search" id="buscarNome" placeholder="Pesquisar jogador pelo nome" aria-label="Pesquisar jogador pelo nome">
+                            </label>
+                            <button class="secondary-button" type="submit">Pesquisar</button>
+                            <button class="text-button" type="button" id="clear">Limpar</button>
+                        </form>
+
+                        <div class="list-legend" aria-hidden="true">
+                            <span>JOGADOR</span>
+                            <span>IDADE</span>
+                            <span>DESEMPENHO</span>
+                            <span>VALOR</span>
+                        </div>
+                        <div class="player-list" id="grid" aria-live="polite">
+                            <div class="loading-state">Conectando ao servidor do clube...</div>
+                        </div>
+                        <div class="panel-footer">
+                            <span><i class="status-dot"></i> Dados sincronizados com o servidor</span>
+                            <span>FC 27 · Clube</span>
+                        </div>
+                    </section>
+                </section>
+
+                <aside class="player-inspector" aria-label="Detalhes do jogador selecionado">
+                    <div class="inspector-heading">
+                        <span class="eyebrow">VISUALIZAÇÃO DO ATLETA</span>
+                        <span class="live-indicator">● AO VIVO</span>
+                    </div>
+                    <div id="detailContent" class="inspector-content">
+                        <div class="inspector-empty">
+                            <div class="empty-emblem">♙</div>
+                            <h2>Selecione um jogador</h2>
+                            <p>Escolha um atleta na lista para visualizar sua carta e acessar as opções de edição.</p>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+
+            <footer class="page-footer">
+                <span>FC 27 · Painel de gerenciamento de jogadores</span>
+                <span>Interface conceitual inspirada no mercado de transferências · Sem vínculo com a EA Sports</span>
+            </footer>
+        </main>
     </div>
-</header>
-
-<main class="shell">
-    <section class="hero">
-        <div class="eyebrow">Ultimate club / Temporada 27</div>
-        <h1>Monte o seu legado.</h1>
-        <p>Gerencie seu elenco, encontre jogadores e coloque as próximas estrelas em campo.</p>
-        <button class="primary" id="add">＋ Adicionar jogador</button>
-    </section>
-
-    <section class="stats" aria-label="Resumo do elenco">
-        <div class="stat">
-            <div>
-                <small>JOGADORES EXIBIDOS</small>
-                <strong id="count">0</strong>
-            </div>
-            <span class="symbol">▦</span>
-        </div>
-        <div class="stat">
-            <div>
-                <small>VALOR EXIBIDO</small>
-                <strong id="total">R$ 0</strong>
-            </div>
-            <span class="symbol">↗</span>
-        </div>
-        <div class="stat">
-            <div>
-                <small>LENDAS EXIBIDAS</small>
-                <strong id="legends">0</strong>
-            </div>
-            <span class="symbol">☆</span>
-        </div>
-    </section>
-
-    <section>
-        <div class="section-head">
-            <div>
-                <div class="eyebrow">Seu elenco</div>
-                <h2>Cartas de jogadores</h2>
-            </div>
-            <form class="toolbar" id="searchForm">
-                <input type="text" id="buscarNome" aria-label="Buscar jogador por nome" placeholder="Buscar por nome" required>
-                <button type="submit">Buscar ↗</button>
-                <button type="button" id="clear">Limpar</button>
-            </form>
-        </div>
-        <div id="grid" class="grid" aria-live="polite"></div>
-    </section>
-
-    <footer>
-        <span>FC 27 • Gerenciamento de jogadores</span>
-        <span>Interface conceitual inspirada nas referências • Sem vínculo com a EA Sports</span>
-    </footer>
-</main>
+</div>
 
 <dialog id="editor" aria-labelledby="editorTitle">
-    <div class="modal-head">
-        <h2 id="editorTitle">Adicionar jogador</h2>
-        <button class="close" type="button" data-close aria-label="Fechar">×</button>
+    <div class="modal-header">
+        <div>
+            <span class="eyebrow">DADOS DO ATLETA</span>
+            <h2 id="editorTitle">Cadastrar jogador</h2>
+        </div>
+        <button class="modal-close" type="button" data-close aria-label="Fechar">×</button>
     </div>
     <form id="playerForm" class="modal-body">
-        <div class="fields">
-            <label class="wide">
-                Nome
-                <input id="nome" maxlength="100" required placeholder="Nome do jogador">
+        <div class="form-grid">
+            <label class="field full-width">
+                Nome do jogador
+                <input id="nome" maxlength="100" required placeholder="Ex.: Eric García">
             </label>
-            <label>
+            <label class="field">
                 Idade
-                <input id="idade" type="number" min="1" max="120" placeholder="Ex.: 23">
+                <input id="idade" type="number" min="1" max="120" required placeholder="Ex.: 24">
             </label>
-            <label>
-                Valor (R$)
-                <input id="valor" type="number" min="0" step="0.01" placeholder="Ex.: 150000">
+            <label class="field">
+                Valor de mercado (R$)
+                <input id="valor" type="number" min="0" step="0.01" required placeholder="Ex.: 1500000">
             </label>
-            <label class="wide">
-                Categoria
-                <select id="categoria">
+            <label class="field full-width">
+                Desempenho
+                <select id="categoria" required>
                     <option value="horrivel">Horrível</option>
                     <option value="ruim">Ruim</option>
                     <option value="mediano" selected>Mediano</option>
@@ -109,45 +175,34 @@
                 </select>
             </label>
         </div>
-        <p class="note">Todos os campos são salvos na API. A nota da carta é ilustrativa, baseada no desempenho. O elenco exibe os jogadores cadastrados ou buscados nesta sessão.</p>
-        <p class="modal-error" id="formError" role="alert" hidden></p>
-        <div class="actions">
-            <button type="button" data-close>Cancelar</button>
-            <button class="primary" type="submit">Salvar jogador</button>
+        <p class="form-hint">A classificação visual da carta é calculada a partir do desempenho selecionado.</p>
+        <p class="form-error" id="formError" role="alert" hidden></p>
+        <div class="modal-actions">
+            <button class="secondary-button" type="button" data-close>Cancelar</button>
+            <button class="primary-button" type="submit">Salvar jogador</button>
         </div>
     </form>
 </dialog>
 
-<dialog id="detail" aria-labelledby="detailTitle">
-    <div class="modal-head">
-        <h2 id="detailTitle">Detalhes do jogador</h2>
-        <button class="close" data-close aria-label="Fechar">×</button>
+<dialog id="confirm" aria-labelledby="confirmTitle" class="confirm-dialog">
+    <div class="modal-header">
+        <div>
+            <span class="eyebrow">AÇÃO PERMANENTE</span>
+            <h2 id="confirmTitle">Excluir jogador?</h2>
+        </div>
+        <button class="modal-close" type="button" data-close aria-label="Fechar">×</button>
     </div>
     <div class="modal-body">
-        <div id="detailContent"></div>
-        <div class="actions">
-            <button class="danger" id="remove">Excluir</button>
-            <button class="primary" id="edit">Editar jogador</button>
+        <p id="confirmText" class="confirm-copy"></p>
+        <p class="form-error" id="deleteError" role="alert" hidden></p>
+        <div class="modal-actions">
+            <button class="secondary-button" type="button" data-close>Cancelar</button>
+            <button class="danger-button" type="button" id="confirmRemove">Confirmar exclusão</button>
         </div>
     </div>
 </dialog>
 
-<dialog id="confirm" aria-labelledby="confirmTitle">
-    <div class="modal-head">
-        <h2 id="confirmTitle">Excluir jogador?</h2>
-        <button class="close" data-close aria-label="Fechar">×</button>
-    </div>
-    <div class="modal-body">
-        <p id="confirmText"></p>
-        <p class="modal-error" id="deleteError" role="alert" hidden></p>
-        <div class="actions">
-            <button data-close>Cancelar</button>
-            <button class="danger" id="confirmRemove">Confirmar exclusão</button>
-        </div>
-    </div>
-</dialog>
-
-<div id="notice" class="notice" role="status" hidden></div>
+<div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
 <script src="script.js"></script>
 </body>
 </html>

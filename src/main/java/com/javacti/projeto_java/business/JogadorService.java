@@ -26,17 +26,4 @@ public class JogadorService {
     public void deletarJogadorPorNome(String name){
         repository.deleteByName(name);
     }
-
-    public void atualizarJogadorPorId(Integer id, Jogador jogador){
-        Jogador jogadorEntity = repository.findById(id).orElseThrow(() -> new RuntimeException("Id inexistente"));
-        Jogador jogadorAtualizado = Jogador.builder()
-                .name(jogador.getName() != null ? jogador.getName() : jogadorEntity.getName())
-                .idade(jogador.getIdade() != null ? jogador.getIdade() : jogadorEntity.getIdade())
-                .valor(jogador.getValor() != null ? jogador.getValor() : jogadorEntity.getValor())
-                .desempenho(jogador.getDesempenho() != null ? jogador.getDesempenho() : jogadorEntity.getDesempenho())
-                .id(id)
-                .build();
-
-        repository.saveAndFlush(jogadorAtualizado);
-    }
 }
